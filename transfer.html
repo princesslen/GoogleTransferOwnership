@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer Google Drive Ownership</title>
+  <style>
+    :root {
+      --primary: #4CAF50;
+      --primary-dark: #388E3C;
+      --background: #f4f7f9;
+      --white: #ffffff;
+      --gray: #7a7a7a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--background);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: var(--white);
+      padding: 30px 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      color: var(--gray);
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    #message {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔁 Transfer File Ownership</h2>
+    <form id="transferForm">
+      <label for="fileId">File ID</label>
+      <input type="text" id="fileId" required placeholder="Enter the File ID">
+
+      <label for="newOwnerEmail">New Owner Email</label>
+      <input type="email" id="newOwnerEmail" required placeholder="Enter new owner's email">
+
+      <button type="submit">Transfer Ownership</button>
+    </form>
+
+    <p id="message"></p>
+  </div>
+
+  <script>
+    document.getElementById('transferForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const fileId = document.getElementById('fileId').value;
+      const newOwnerEmail = document.getElementById('newOwnerEmail').value;
+      const message = document.getElementById('message');
+
+      message.style.color = '#555';
+      message.textContent = '⏳ Transferring...';
+
+      try {
+        const response = await fetch('/transfer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fileId, newOwnerEmail }),
+        });
+
+        const text = await response.text();
+        message.style.color = response.ok ? '#2e7d32' : '#d32f2f';
+        message.textContent = response.ok ? `✅ ${text}` : `❌ ${text}`;
+      } catch (error) {
+        console.error(error);
+        message.style.color = '#d32f2f';
+        message.textContent = '❌ Error occurred. See console.';
+      }
+    });
+  </script>
+</body>
+</html>
